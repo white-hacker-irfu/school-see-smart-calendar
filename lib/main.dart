@@ -14,12 +14,14 @@ class MyApp extends StatelessWidget {
       title: 'Smart Calendar',
       theme: ThemeData(
         primarySwatch: Colors.purple,
+        scaffoldBackgroundColor: Colors.white, // Set app background to white
       ),
       debugShowCheckedModeBanner: false,
       home: CalendarScreen(),
     );
   }
 }
+
 
 class CalendarScreen extends StatefulWidget {
   @override
@@ -128,9 +130,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
           ),
           Flexible(
             child: Text(
-              DateFormat('MMMM yyyy').format(_currentMonth), // No capitalization
+              DateFormat('MMMM yyyy').format(_currentMonth).toUpperCase(), // Convert to uppercase
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis, // Prevents overflow issue
+              overflow: TextOverflow.ellipsis,
             ),
           ),
           IconButton(
@@ -145,6 +147,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       ),
     );
   }
+
 
   Widget _buildDaysOfWeek() {
     return Padding(
@@ -196,13 +199,18 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget _buildDayCell(int day, {bool isFaded = false}) {
-    bool isSelected = _selectedDay == DateTime(_currentMonth.year, _currentMonth.month, day);
+    DateTime dayDate = DateTime(_currentMonth.year, _currentMonth.month, day);
+    bool isSelected = !isFaded &&
+        _selectedDay.year == dayDate.year &&
+        _selectedDay.month == dayDate.month &&
+        _selectedDay.day == dayDate.day;
+
     return GestureDetector(
       onTap: isFaded
-          ? null
+          ? null  // Prevent selection of faded (previous/next month) dates
           : () {
         setState(() {
-          _selectedDay = DateTime(_currentMonth.year, _currentMonth.month, day);
+          _selectedDay = dayDate;
         });
       },
       child: Container(
@@ -224,6 +232,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
+
   Widget _buildEventList() {
     return ListView.builder(
       padding: const EdgeInsets.all(0.0),
@@ -240,7 +249,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: eventPadding, vertical: 18.0),
+            padding: EdgeInsets.symmetric(horizontal: eventPadding, vertical: 15.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
